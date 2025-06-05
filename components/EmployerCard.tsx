@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Employer, Video } from "@/types/profile";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,9 +14,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { Edit2, Save, X, Trash2, Plus } from "lucide-react";
 import VideoGrid from "./VideoGrid";
+import { mockExtractSkillsFromText } from "@/lib/api";
+import { Badge } from "@/components/ui/badge";
 
 interface EmployerCardProps {
   employer: Employer;
@@ -32,20 +33,46 @@ export default function EmployerCard({
   startInEditMode = false,
 }: EmployerCardProps) {
   const [isEditing, setIsEditing] = useState(startInEditMode);
+  const [isExtractingSkills, setIsExtractingSkills] = useState(false);
   const [editData, setEditData] = useState({
     name: employer.name,
     jobTitle: employer.jobTitle || "",
     duration: employer.duration || "",
     employmentType: employer.employmentType || "contract",
     summary: employer.summary || "",
+    suggestedSkills: employer.suggestedSkills || [],
   });
 
-  const handleSave = () => {
-    const updatedEmployer = {
+  useEffect(() => {
+    setEditData({
+      name: employer.name,
+      jobTitle: employer.jobTitle || "",
+      duration: employer.duration || "",
+      employmentType: employer.employmentType || "contract",
+      summary: employer.summary || "",
+      suggestedSkills: employer.suggestedSkills || [],
+    });
+  }, [employer, isEditing]); // Re-sync if employer changes or isEditing state toggles
+
+  const handleSave = async () => {
+    setIsExtractingSkills(true);
+    const combinedText = `${editData.jobTitle} ${editData.summary}`;
+    const skills = await mockExtractSkillsFromText(combinedText);
+    setIsExtractingSkills(false);
+
+    const updatedEmployerData = {
       ...employer,
-      ...editData,
+      name: editData.name,
+      jobTitle: editData.jobTitle,
+      duration: editData.duration,
+      employmentType: editData.employmentType as
+        | "full-time"
+        | "contract"
+        | "freelance",
+      summary: editData.summary,
+      suggestedSkills: skills,
     };
-    onUpdate(updatedEmployer);
+    onUpdate(updatedEmployerData);
     setIsEditing(false);
   };
 
@@ -56,6 +83,7 @@ export default function EmployerCard({
       duration: employer.duration || "",
       employmentType: employer.employmentType || "contract",
       summary: employer.summary || "",
+      suggestedSkills: employer.suggestedSkills || [],
     });
     setIsEditing(false);
   };
@@ -186,6 +214,26 @@ export default function EmployerCard({
                   rows={3}
                 />
               </div>
+
+              <div className="space-y-2 mt-4">
+                <Label>Suggested Skills</Label>
+                {isExtractingSkills ? (
+                  <p className="text-sm text-gray-500">Extracting skills...</p>
+                ) : editData.suggestedSkills &&
+                  editData.suggestedSkills.length > 0 ? (
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {editData.suggestedSkills.map((skill) => (
+                      <Badge key={skill} variant="secondary">
+                        {skill}
+                      </Badge>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500 pt-1">
+                    No specific skills detected automatically.
+                  </p>
+                )}
+              </div>
             </div>
           ) : (
             <div className="space-y-3">
@@ -201,9 +249,11 @@ export default function EmployerCard({
                 <div className="flex items-center space-x-2">
                   {employer.employmentType && (
                     <Badge
-                      className={getEmploymentTypeColor(
+                      className={
+                        getEmploymentTypeColor(employer.employmentType) +
+                        " " +
                         employer.employmentType
-                      )}
+                      }
                     >
                       {employer.employmentType.charAt(0).toUpperCase() +
                         employer.employmentType.slice(1)}
@@ -221,6 +271,28 @@ export default function EmployerCard({
                   {employer.summary}
                 </p>
               )}
+
+              {/* Display suggested skills in non-edit mode as well, if they exist */}
+              {employer.suggestedSkills &&
+                employer.suggestedSkills.length > 0 &&
+                !isEditing && (
+                  <div className="mt-3">
+                    <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                      Skills Highlighted
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {employer.suggestedSkills.map((skill) => (
+                        <Badge
+                          key={skill}
+                          variant="outline"
+                          className="font-normal"
+                        >
+                          {skill}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
             </div>
           )}
         </div>
