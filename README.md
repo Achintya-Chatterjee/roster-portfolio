@@ -58,6 +58,15 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
   - Talent can add, edit, and delete employer/client entries.
   - Talent can add, edit (title, duration), and delete videos associated with each employer.
   - Changes are persisted in `localStorage` for the demo.
+
+* **AI-Powered Skill Suggestion**:
+  - When adding or editing employer/client experiences, the system (mock) analyzes the job title and summary to suggest relevant skills.
+  - These suggested skills are displayed to the user for review within the employer card.
+* **Centralized Skill Management**:
+  - A dedicated "Skills" section on the profile page allows users to view and manage their confirmed skill set.
+  - Users can manually add new skills or remove existing ones.
+  - The "Skills" section also provides an interface to easily add skills suggested from their various employer experiences into their main skill list.
+
 - **Responsive UI**: Designed to work on different screen sizes.
 
 ## Folder Structure Overview

@@ -52,7 +52,7 @@ export default function EmployerCard({
       summary: employer.summary || "",
       suggestedSkills: employer.suggestedSkills || [],
     });
-  }, [employer, isEditing]); // Re-sync if employer changes or isEditing state toggles
+  }, [employer, isEditing]);
 
   const handleSave = async () => {
     setIsExtractingSkills(true);
