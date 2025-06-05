@@ -1,9 +1,11 @@
-import type { ProfileData, Video } from "@/types/profile"
+import type { ProfileData, Video } from "@/types/profile";
 
 // Mock API function to simulate portfolio data extraction
-export async function mockExtractPortfolioData(url: string): Promise<ProfileData> {
+export async function mockExtractPortfolioData(
+  url: string
+): Promise<ProfileData> {
   // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 2000))
+  await new Promise((resolve) => setTimeout(resolve, 2000));
 
   // Mock different responses based on URL
   if (url.includes("sonuchoudhary")) {
@@ -61,7 +63,8 @@ export async function mockExtractPortfolioData(url: string): Promise<ProfileData
           ],
         },
       ],
-    }
+      skills: [], // Add this line
+    };
   } else if (url.includes("dellinzhang")) {
     return {
       username: "dellin",
@@ -99,7 +102,8 @@ export async function mockExtractPortfolioData(url: string): Promise<ProfileData
           ],
         },
       ],
-    }
+      skills: [], // Add this line
+    };
   }
 
   // Default response for unknown URLs
@@ -108,44 +112,108 @@ export async function mockExtractPortfolioData(url: string): Promise<ProfileData
     firstName: "Creative",
     lastName: "Professional",
     title: "Creative Professional",
-    summary: "Passionate about creating amazing visual content and telling stories through media.",
+    summary:
+      "Passionate about creating amazing visual content and telling stories through media.",
     location: "Remote",
     originalUrl: url,
     employers: [],
-  }
+    skills: [],
+  };
 }
 
 // Mock API functions for CRUD operations
-export async function updateProfile(profileData: ProfileData): Promise<ProfileData> {
+export async function updateProfile(
+  profileData: ProfileData
+): Promise<ProfileData> {
   // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 500))
-  return profileData
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  return profileData;
 }
 
-export async function addEmployer(profileId: string, employer: any): Promise<any> {
-  await new Promise((resolve) => setTimeout(resolve, 500))
-  return { ...employer, id: Date.now().toString() }
+export async function addEmployer(
+  profileId: string,
+  employer: any
+): Promise<any> {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  return { ...employer, id: Date.now().toString() };
 }
 
-export async function updateEmployer(employerId: string, employer: any): Promise<any> {
-  await new Promise((resolve) => setTimeout(resolve, 500))
-  return employer
+export async function updateEmployer(
+  employerId: string,
+  employer: any
+): Promise<any> {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  return employer;
 }
 
 export async function deleteEmployer(employerId: string): Promise<void> {
-  await new Promise((resolve) => setTimeout(resolve, 500))
+  await new Promise((resolve) => setTimeout(resolve, 500));
 }
 
-export async function addVideo(employerId: string, video: Omit<Video, "id">): Promise<Video> {
-  await new Promise((resolve) => setTimeout(resolve, 500))
-  return { ...video, id: Date.now().toString() }
+export async function addVideo(
+  employerId: string,
+  video: Omit<Video, "id">
+): Promise<Video> {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  return { ...video, id: Date.now().toString() };
 }
 
-export async function updateVideo(videoId: string, video: Video): Promise<Video> {
-  await new Promise((resolve) => setTimeout(resolve, 500))
-  return video
+export async function updateVideo(
+  videoId: string,
+  video: Video
+): Promise<Video> {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  return video;
 }
 
 export async function deleteVideo(videoId: string): Promise<void> {
-  await new Promise((resolve) => setTimeout(resolve, 500))
+  await new Promise((resolve) => setTimeout(resolve, 500));
+}
+
+export async function mockExtractSkillsFromText(
+  text: string
+): Promise<string[]> {
+  await new Promise((resolve) =>
+    setTimeout(resolve, Math.random() * 500 + 500)
+  ); // Simulate 0.5-1s delay
+
+  if (!text || text.trim() === "") {
+    return [];
+  }
+
+  const predefinedSkills = [
+    "Video Editing",
+    "Motion Graphics",
+    "Graphic Design",
+    "UI/UX Design",
+    "Illustration",
+    "Photography",
+    "Copywriting",
+    "Content Creation",
+    "Social Media Marketing",
+    "Project Management",
+    "Frontend Development",
+    "Backend Development",
+    "Full-Stack Development",
+    "Data Analysis",
+    "Brand Strategy",
+    "SEO Optimization",
+    "Adobe Creative Suite",
+    "Final Cut Pro",
+    "DaVinci Resolve",
+    "Figma",
+    "Sketch",
+    "Canva",
+  ];
+
+  const lowerText = text.toLowerCase();
+  const extractedSkills = new Set<string>();
+
+  predefinedSkills.forEach((skill) => {
+    if (lowerText.includes(skill.toLowerCase())) {
+      extractedSkills.add(skill);
+    }
+  });
+
+  return Array.from(extractedSkills);
 }

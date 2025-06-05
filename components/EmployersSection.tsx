@@ -1,20 +1,27 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import type { ProfileData, Employer } from "@/types/profile"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
-import EmployerCard from "./EmployerCard"
+import { useState } from "react";
+import type { ProfileData, Employer } from "@/types/profile";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import EmployerCard from "./EmployerCard";
 
 interface EmployersSectionProps {
-  profileData: ProfileData
-  onUpdate: (data: ProfileData) => void
+  profileData: ProfileData;
+  onUpdate: (data: ProfileData) => void;
 }
 
-export default function EmployersSection({ profileData, onUpdate }: EmployersSectionProps) {
-  const [employers, setEmployers] = useState<Employer[]>(profileData.employers || [])
-  const [newlyAddedEmployerId, setNewlyAddedEmployerId] = useState<string | null>(null)
+export default function EmployersSection({
+  profileData,
+  onUpdate,
+}: EmployersSectionProps) {
+  const [employers, setEmployers] = useState<Employer[]>(
+    profileData.employers || []
+  );
+  const [newlyAddedEmployerId, setNewlyAddedEmployerId] = useState<
+    string | null
+  >(null);
 
   const addNewEmployer = () => {
     const newEmployer: Employer = {
@@ -25,46 +32,55 @@ export default function EmployersSection({ profileData, onUpdate }: EmployersSec
       employmentType: "contract",
       summary: "",
       videos: [],
-    }
+    };
 
-    const updatedEmployers = [...employers, newEmployer]
-    setEmployers(updatedEmployers)
-    setNewlyAddedEmployerId(newEmployer.id) // Keep track of the new employer
+    const updatedEmployers = [...employers, newEmployer];
+    setEmployers(updatedEmployers);
+    setNewlyAddedEmployerId(newEmployer.id); // Keep track of the new employer
 
     const updatedProfile = {
       ...profileData,
       employers: updatedEmployers,
-    }
-    onUpdate(updatedProfile)
-  }
+    };
+    onUpdate(updatedProfile);
+  };
 
   const updateEmployer = (employerId: string, updatedEmployer: Employer) => {
-    const updatedEmployers = employers.map((emp) => (emp.id === employerId ? updatedEmployer : emp))
-    setEmployers(updatedEmployers)
+    const updatedEmployers = employers.map((emp) =>
+      emp.id === employerId ? updatedEmployer : emp
+    );
+    setEmployers(updatedEmployers);
 
     const updatedProfile = {
       ...profileData,
       employers: updatedEmployers,
-    }
-    onUpdate(updatedProfile)
-  }
+    };
+    onUpdate(updatedProfile);
+  };
 
   const deleteEmployer = (employerId: string) => {
-    const updatedEmployers = employers.filter((emp) => emp.id !== employerId)
-    setEmployers(updatedEmployers)
+    const updatedEmployers = employers.filter((emp) => emp.id !== employerId);
+    setEmployers(updatedEmployers);
 
     const updatedProfile = {
       ...profileData,
       employers: updatedEmployers,
-    }
-    onUpdate(updatedProfile)
-  }
+    };
+    onUpdate(updatedProfile);
+  };
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-        <CardTitle className="text-lg font-semibold">Employers & Clients</CardTitle>
-        <Button variant="outline" size="sm" onClick={addNewEmployer} className="flex items-center space-x-2">
+        <CardTitle className="text-lg font-semibold">
+          Employers & Clients
+        </CardTitle>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={addNewEmployer}
+          className="flex items-center space-x-2"
+        >
           <Plus className="h-4 w-4" />
           <span>Add Client</span>
         </Button>
@@ -82,9 +98,9 @@ export default function EmployersSection({ profileData, onUpdate }: EmployersSec
               key={employer.id}
               employer={employer}
               onUpdate={(updatedEmployer) => {
-                updateEmployer(employer.id, updatedEmployer)
+                updateEmployer(employer.id, updatedEmployer);
                 if (newlyAddedEmployerId === employer.id) {
-                  setNewlyAddedEmployerId(null) // Reset after first save
+                  setNewlyAddedEmployerId(null); // Reset after first save
                 }
               }}
               onDelete={() => deleteEmployer(employer.id)}
@@ -94,5 +110,5 @@ export default function EmployersSection({ profileData, onUpdate }: EmployersSec
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

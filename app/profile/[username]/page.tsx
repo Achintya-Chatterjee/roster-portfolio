@@ -1,66 +1,82 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useParams } from "next/navigation"
-import type { ProfileData } from "@/types/profile"
-import ProfileHeader from "@/components/ProfileHeader"
-import BasicInfoSection from "@/components/BasicInfoSection"
-import EmployersSection from "@/components/EmployersSection"
-import { Button } from "@/components/ui/button"
-import { ArrowLeft, Share2 } from "lucide-react"
-import Link from "next/link"
-import { toast } from "@/hooks/use-toast"
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import type { ProfileData } from "@/types/profile";
+import ProfileHeader from "@/components/ProfileHeader";
+import BasicInfoSection from "@/components/BasicInfoSection";
+import EmployersSection from "@/components/EmployersSection";
+import SkillsSection from "@/components/SkillsSection";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Share2 } from "lucide-react";
+import Link from "next/link";
+import { toast } from "@/hooks/use-toast";
 
 export default function ProfilePage() {
-  const params = useParams()
-  const [profileData, setProfileData] = useState<ProfileData | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const params = useParams();
+  const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // In a real app, this would fetch from an API using the username
-    const storedData = localStorage.getItem("profileData")
+    const storedData = localStorage.getItem("profileData");
     if (storedData) {
-      const data = JSON.parse(storedData)
-      setProfileData(data)
+      const data = JSON.parse(storedData);
+      setProfileData(data);
     }
-    setIsLoading(false)
-  }, [params.username])
+    setIsLoading(false);
+  }, [params.username]);
 
   const handleShare = async () => {
-    const url = window.location.href
+    const url = window.location.href;
     try {
-      await navigator.clipboard.writeText(url)
+      await navigator.clipboard.writeText(url);
       toast({
         title: "Link copied!",
         description: "Profile link has been copied to clipboard.",
-      })
+      });
     } catch (err) {
       toast({
         title: "Share",
         description: `Share this profile: ${url}`,
-      })
+      });
     }
-  }
+  };
 
   const updateProfileData = (updatedData: ProfileData) => {
-    setProfileData(updatedData)
-    localStorage.setItem("profileData", JSON.stringify(updatedData))
-  }
+    setProfileData(updatedData);
+    localStorage.setItem("profileData", JSON.stringify(updatedData));
+  };
+
+  const handleUpdateSkills = (updatedSkills: string[]) => {
+    if (!profileData) return;
+
+    const newProfileData: ProfileData = {
+      ...profileData,
+      skills: updatedSkills,
+    };
+    setProfileData(newProfileData); 
+    localStorage.setItem("profileData", JSON.stringify(newProfileData)); // Update localStorage
+  };
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
       </div>
-    )
+    );
   }
 
   if (!profileData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold text-gray-900">Profile not found</h1>
-          <p className="text-gray-600">The profile you're looking for doesn't exist.</p>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Profile not found
+          </h1>
+          <p className="text-gray-600">
+            The profile you're looking for doesn't exist.
+          </p>
           <Link href="/">
             <Button>
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -69,7 +85,7 @@ export default function ProfilePage() {
           </Link>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -104,16 +120,32 @@ export default function ProfilePage() {
           <ProfileHeader profileData={profileData} />
 
           <div className="grid lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-1">
-              <BasicInfoSection profileData={profileData} onUpdate={updateProfileData} />
+            <div className="lg:col-span-1 space-y-8">
+              {" "}
+
+              <BasicInfoSection
+                profileData={profileData}
+                onUpdate={updateProfileData}
+              />
+
+              {profileData && (
+                <SkillsSection
+                  skills={profileData.skills}
+                  employers={profileData.employers}
+                  onUpdateSkills={handleUpdateSkills}
+                />
+              )}
             </div>
 
             <div className="lg:col-span-2">
-              <EmployersSection profileData={profileData} onUpdate={updateProfileData} />
+              <EmployersSection
+                profileData={profileData}
+                onUpdate={updateProfileData}
+              />
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
