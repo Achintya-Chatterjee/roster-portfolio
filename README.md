@@ -8,7 +8,7 @@ This project implements a feature for Roster that allows talent to submit a link
 - **Language**: TypeScript
 - **UI**: React
 - **Styling**: Tailwind CSS
-- **Components**: Shadcn/ui (based on typical Next.js/Tailwind projects, please adjust if different)
+- **Components**: Shadcn/ui
 - **Package Manager**: pnpm
 
 ## Getting Started
@@ -21,9 +21,10 @@ This project implements a feature for Roster that allows talent to submit a link
 ### Installation
 
 1.  **Clone the repository:**
+
     ```bash
     git clone git@github.com:Achintya-Chatterjee/roster-portfolio.git
-    cd roster-portfolio-feature 
+    cd roster-portfolio-feature
     ```
 
 2.  **Install dependencies using pnpm:**
@@ -43,21 +44,21 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Key Features
 
--   **Portfolio Link Submission**: Users can submit a URL to their external portfolio.
--   **Mock Data Extraction**: A mock API simulates extracting data from the provided URL.
-    -   Supports two example portfolios with different structures:
-        -   `https://sonuchoudhary.my.canva.site/portfolio`
-        -   `https://dellinzhang.com/video-edit`
--   **Dynamic Profile Page Creation**: Generates a unique profile page (e.g., `/profile/sonu`).
--   **Structured Profile Display**:
-    -   **Basic Information**: Name, professional title, location, summary.
-    -   **Employers/Clients**: Lists employers/clients with associated job title, duration, employment type, summary, and videos.
--   **In-Page Editing**:
-    -   Talent can edit their basic information directly on the profile page.
-    -   Talent can add, edit, and delete employer/client entries.
-    -   Talent can add, edit (title, duration), and delete videos associated with each employer.
-    -   Changes are persisted in `localStorage` for the demo.
--   **Responsive UI**: Designed to work on different screen sizes.
+- **Portfolio Link Submission**: Users can submit a URL to their external portfolio.
+- **Mock Data Extraction**: A mock API simulates extracting data from the provided URL.
+  - Supports two example portfolios with different structures:
+    - `https://sonuchoudhary.my.canva.site/portfolio`
+    - `https://dellinzhang.com/video-edit`
+- **Dynamic Profile Page Creation**: Generates a unique profile page (e.g., `/profile/sonu`).
+- **Structured Profile Display**:
+  - **Basic Information**: Name, professional title, location, summary.
+  - **Employers/Clients**: Lists employers/clients with associated job title, duration, employment type, summary, and videos.
+- **In-Page Editing**:
+  - Talent can edit their basic information directly on the profile page.
+  - Talent can add, edit, and delete employer/client entries.
+  - Talent can add, edit (title, duration), and delete videos associated with each employer.
+  - Changes are persisted in `localStorage` for the demo.
+- **Responsive UI**: Designed to work on different screen sizes.
 
 ## Folder Structure Overview
 
@@ -93,7 +94,6 @@ roster-portfolio/
 
 ## Mock API and Data Handling
 
--   All API calls related to data extraction and profile updates are mocked within `lib/api.ts`.
--   No backend is required for this assignment.
--   Profile data generated from the submitted URL is stored in the browser's `localStorage` to simulate persistence across navigations for the demo.
-
+- All API calls related to data extraction and profile updates are mocked within `lib/api.ts`.
+- No backend is required for this assignment.
+- Profile data generated from the submitted URL is stored in the browser's `localStorage` to simulate persistence across navigations for the demo.
