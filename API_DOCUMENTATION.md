@@ -319,5 +319,56 @@ All data is currently persisted in the browser's `localStorage`.
 
 ---
 
+## 10. Analyze Job Match (Conceptual)
+
+- **Function**: `mockAnalyzeJobMatch(profileData: ProfileData, jobText: string)`
+- **Conceptual HTTP Method**: `POST` (as it involves sending data for processing)
+- **Conceptual Path**: `/api/profile/analyze-job-match`
+- **Description**: Simulates an analysis of the user's profile (`profileData`) against a provided job description text (`jobText`). It returns a match score and detailed insights.
+- **Request Body (Conceptual)**:
+  - While `profileData` is passed directly from the application context in the mock, and `jobText` is a direct parameter, conceptually, a backend endpoint might expect something like this:
+  ```json
+  {
+    "profileData": {
+      "username": "sonu",
+      "skills": ["Video Editing", "Motion Graphics"],
+      "employers": [
+        {
+          "summary": "Led video editing projects."
+        }
+      ]
+    },
+    "jobText": "Seeking a skilled Video Editor with experience in motion graphics..."
+  }
+  ```
+- **Response (200 OK)**:
+  - **Content-Type**: `application/json`
+  - **Body**: `MatchResult` object (defined in `types/job.ts`).
+  ```json
+  {
+    "overallScore": 75,
+    "matchingSkills": ["Video Editing", "Motion Graphics"],
+    "missingSkills": ["Adobe After Effects"],
+    "matchingExperienceKeywords": ["Video Editing", "motion graphics"],
+    "notes": "Good alignment. Your profile shows several key matches."
+  }
+  ```
+  - If `jobText` is empty, `overallScore` will be 0 and `notes` will indicate the issue.
+- **Response (400 Bad Request - e.g., if `jobText` is missing or `profileData` is invalid for a real backend)**
+  ```json
+  {
+    "error": "Invalid input: Job description text and profile data are required."
+  }
+  ```
+- **Response (500 Internal Server Error - e.g., if analysis fails unexpectedly)**
+  ```json
+  {
+    "error": "An unexpected error occurred during job match analysis."
+  }
+  ```
+
+---
+
 **Note on Data Types:**
 Refer to `types/profile.ts` for detailed structures of `ProfileData`, `Employer`, and `Video` types.
+Also refer to `types/job.ts` for `MatchResult`.

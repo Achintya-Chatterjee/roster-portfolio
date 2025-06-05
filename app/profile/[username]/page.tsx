@@ -8,14 +8,31 @@ import BasicInfoSection from "@/components/BasicInfoSection";
 import EmployersSection from "@/components/EmployersSection";
 import SkillsSection from "@/components/SkillsSection";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Share2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Share2,
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+} from "lucide-react";
 import Link from "next/link";
 import { toast } from "@/hooks/use-toast";
+import JobMatchInput from "@/components/JobMatchInput";
+import JobMatchResults from "@/components/JobMatchResults";
+import { mockAnalyzeJobMatch } from "@/lib/api";
+import type { MatchResult } from "@/types/job";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function ProfilePage() {
   const params = useParams();
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [jobMatchResult, setJobMatchResult] = useState<MatchResult | null>(
+    null
+  );
+  const [isAnalyzingMatch, setIsAnalyzingMatch] = useState(false);
+  const [showJobMatchAnalyzer, setShowJobMatchAnalyzer] = useState(false);
 
   useEffect(() => {
     // In a real app, this would fetch from an API using the username
@@ -55,8 +72,55 @@ export default function ProfilePage() {
       ...profileData,
       skills: updatedSkills,
     };
-    setProfileData(newProfileData); 
-    localStorage.setItem("profileData", JSON.stringify(newProfileData)); // Update localStorage
+    setProfileData(newProfileData);
+    localStorage.setItem("profileData", JSON.stringify(newProfileData));
+  };
+
+  const handleStartAnalysis = async (jobText: string) => {
+    if (!profileData) {
+      console.error("Profile data is not available for analysis.");
+      toast({
+        title: "Error",
+        description: "Profile data not loaded. Cannot start analysis.",
+        variant: "destructive",
+      });
+      setIsAnalyzingMatch(false);
+      return;
+    }
+    setIsAnalyzingMatch(true);
+    setJobMatchResult(null);
+    try {
+      const result = await mockAnalyzeJobMatch(profileData, jobText);
+      setJobMatchResult(result);
+    } catch (error) {
+      console.error("Error during job match analysis:", error);
+      toast({
+        title: "Analysis Failed",
+        description: "An error occurred during analysis. Please try again.",
+        variant: "destructive",
+      });
+      setJobMatchResult({
+        overallScore: 0,
+        matchingSkills: [],
+        missingSkills: [],
+        matchingExperienceKeywords: [],
+        notes: "An error occurred during analysis. Please try again.",
+      });
+    } finally {
+      setIsAnalyzingMatch(false);
+    }
+  };
+
+  const handleClearJobMatchResults = () => {
+    setJobMatchResult(null);
+  };
+
+  const toggleJobMatchAnalyzer = () => {
+    const newState = !showJobMatchAnalyzer;
+    setShowJobMatchAnalyzer(newState);
+    if (!newState) {
+      setJobMatchResult(null);
+    }
   };
 
   if (isLoading) {
@@ -122,12 +186,11 @@ export default function ProfilePage() {
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-1 space-y-8">
               {" "}
-
               <BasicInfoSection
                 profileData={profileData}
                 onUpdate={updateProfileData}
               />
-
+              {/* Add SkillsSection here */}
               {profileData && (
                 <SkillsSection
                   skills={profileData.skills}
@@ -143,6 +206,53 @@ export default function ProfilePage() {
                 onUpdate={updateProfileData}
               />
             </div>
+          </div>
+
+          {/* Job Match Analyzer Section */}
+          <div className="mt-10 pt-8 border-t border-gray-200 dark:border-gray-700">
+            <div className="text-center mb-6">
+              <Button
+                onClick={toggleJobMatchAnalyzer}
+                variant="outline"
+                size="lg"
+              >
+                {showJobMatchAnalyzer
+                  ? "Hide Job Analyzer"
+                  : "Analyze Profile Against Job Description"}
+                {showJobMatchAnalyzer ? (
+                  <ChevronUp className="ml-2 h-5 w-5" />
+                ) : (
+                  <ChevronDown className="ml-2 h-5 w-5" />
+                )}
+              </Button>
+            </div>
+
+            {showJobMatchAnalyzer && (
+              <div className="mt-6 space-y-6 rounded-lg bg-white dark:bg-gray-800 p-6 shadow">
+                {" "}
+                {/* Added Card like container */}
+                <JobMatchInput
+                  onAnalyze={handleStartAnalysis}
+                  isLoading={isAnalyzingMatch}
+                />
+                {isAnalyzingMatch && (
+                  <Card>
+                    <CardContent className="pt-6 flex flex-col items-center justify-center space-y-2">
+                      <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+                      <p className="text-gray-600 dark:text-gray-300">
+                        Analyzing your profile, please wait...
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+                {jobMatchResult && !isAnalyzingMatch && (
+                  <JobMatchResults
+                    matchResult={jobMatchResult}
+                    onClearResults={handleClearJobMatchResults}
+                  />
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

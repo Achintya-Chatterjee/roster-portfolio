@@ -1,4 +1,5 @@
 import type { ProfileData, Video } from "@/types/profile";
+import type { MatchResult } from "@/types/job";
 
 // Mock API function to simulate portfolio data extraction
 export async function mockExtractPortfolioData(
@@ -117,7 +118,7 @@ export async function mockExtractPortfolioData(
     location: "Remote",
     originalUrl: url,
     employers: [],
-    skills: [],
+    skills: [], // Add this line
   };
 }
 
@@ -216,4 +217,97 @@ export async function mockExtractSkillsFromText(
   });
 
   return Array.from(extractedSkills);
+}
+
+export async function mockAnalyzeJobMatch(
+  profileData: ProfileData,
+  jobText: string
+): Promise<MatchResult> {
+  await new Promise((resolve) =>
+    setTimeout(resolve, Math.random() * 1000 + 1000)
+  );
+
+  if (!jobText || !jobText.trim()) {
+    return {
+      overallScore: 0,
+      matchingSkills: [],
+      missingSkills: await mockExtractSkillsFromText(jobText),
+      matchingExperienceKeywords: [],
+      notes: "Please provide a job description for analysis.",
+    };
+  }
+
+  const jobSkills = await mockExtractSkillsFromText(jobText);
+  const profileSkills = profileData.skills || [];
+  const profileSkillsLower = profileSkills.map((s) => s.toLowerCase());
+  const jobSkillsLower = jobSkills.map((s) => s.toLowerCase());
+
+  const matchingSkills = profileSkills.filter((ps) =>
+    jobSkillsLower.includes(ps.toLowerCase())
+  );
+
+  const missingSkills = jobSkills.filter(
+    (js) => !profileSkillsLower.includes(js.toLowerCase())
+  );
+
+  const foundExperienceKeywords = new Set<string>();
+  const experiencesText = [
+    profileData.summary || "",
+    ...(profileData.employers || []).map(
+      (e) => `${e.jobTitle || ""} ${e.summary || ""}`
+    ),
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  jobSkills.forEach((jobSkill) => {
+    if (experiencesText.includes(jobSkill.toLowerCase())) {
+      foundExperienceKeywords.add(jobSkill);
+    }
+  });
+
+  const matchingExperienceKeywords = Array.from(foundExperienceKeywords);
+
+  let skillMatchScorePortion = 0;
+  if (jobSkills.length > 0) {
+    skillMatchScorePortion = (matchingSkills.length / jobSkills.length) * 70;
+  } else {
+    skillMatchScorePortion = profileSkills.length > 0 ? 30 : 0;
+  }
+
+  const experienceScorePortion = Math.min(
+    matchingExperienceKeywords.length * 5,
+    30
+  );
+
+  let overallScore = Math.round(
+    skillMatchScorePortion + experienceScorePortion
+  );
+  overallScore = Math.max(0, Math.min(100, overallScore));
+
+  let notes = "";
+  if (overallScore >= 80) {
+    notes =
+      "This looks like a very strong match! Your skills and experience align well with the job description.";
+  } else if (overallScore >= 60) {
+    notes = "Good alignment. Your profile shows several key matches.";
+  } else if (overallScore >= 40) {
+    notes =
+      "Some alignment found. Consider highlighting more relevant skills or experiences for this type of role.";
+  } else {
+    notes =
+      "There may be opportunities to better tailor your profile to this job description. Focus on highlighting relevant skills and experiences.";
+  }
+
+  if (!jobText.trim()) {
+    notes = "Please provide a job description for analysis.";
+  }
+
+  return {
+    overallScore,
+    matchingSkills,
+    missingSkills,
+    matchingExperienceKeywords,
+    notes,
+  };
 }

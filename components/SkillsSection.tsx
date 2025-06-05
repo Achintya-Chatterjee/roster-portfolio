@@ -29,7 +29,6 @@ export default function SkillsSection({
   >([]);
 
   useEffect(() => {
-    // Sync editableSkills with initialSkills when not editing or when initialSkills prop changes
     if (!isEditing) {
       setEditableSkills(initialSkills || []);
     }
