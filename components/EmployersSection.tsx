@@ -14,6 +14,7 @@ interface EmployersSectionProps {
 
 export default function EmployersSection({ profileData, onUpdate }: EmployersSectionProps) {
   const [employers, setEmployers] = useState<Employer[]>(profileData.employers || [])
+  const [newlyAddedEmployerId, setNewlyAddedEmployerId] = useState<string | null>(null)
 
   const addNewEmployer = () => {
     const newEmployer: Employer = {
@@ -28,6 +29,7 @@ export default function EmployersSection({ profileData, onUpdate }: EmployersSec
 
     const updatedEmployers = [...employers, newEmployer]
     setEmployers(updatedEmployers)
+    setNewlyAddedEmployerId(newEmployer.id) // Keep track of the new employer
 
     const updatedProfile = {
       ...profileData,
@@ -79,8 +81,14 @@ export default function EmployersSection({ profileData, onUpdate }: EmployersSec
             <EmployerCard
               key={employer.id}
               employer={employer}
-              onUpdate={(updatedEmployer) => updateEmployer(employer.id, updatedEmployer)}
+              onUpdate={(updatedEmployer) => {
+                updateEmployer(employer.id, updatedEmployer)
+                if (newlyAddedEmployerId === employer.id) {
+                  setNewlyAddedEmployerId(null) // Reset after first save
+                }
+              }}
               onDelete={() => deleteEmployer(employer.id)}
+              startInEditMode={newlyAddedEmployerId === employer.id}
             />
           ))
         )}
